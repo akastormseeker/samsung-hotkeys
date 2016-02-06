@@ -26,7 +26,17 @@ namespace SamsungHotkeys
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            hkMgr = new HotkeyManager(Dispatcher);
+            try
+            {
+                hkMgr = new HotkeyManager(Dispatcher);
+            }
+            catch(Controls.InterfaceNotInitializedException ex)
+            {
+                System.Windows.Forms.MessageBox.Show("Unable to initialize the Samsung BIOS interface. It would seem that SABI.DLL is not properly installed.", "Samsung Hotkeys", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                App.Current.Shutdown();
+                return;
+            }
+            
             hkMgr.ShowOSDEvent += HkMgr_ShowOSDEvent;
             osdWindow.ShowActivated = false;
             osdWindow.Topmost = true;
