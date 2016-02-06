@@ -12,4 +12,6 @@ The files you need are SABI.sys and Sabi3.dll. Once you have them, place SABI.sy
 
 I was unable to figure out how to manually extract the InstallShield cab files with the EasySettings installer, but I had kept the original files from my working pre-1511 Windows 10 install.
 
-You can still (I think - it might not work any more, but I can't remember!) use a program called FileUnsigner to remove the digital signature from the setup program, and then rename it to something else (ie. INSTALL_YOU_PIECE_OF_.exe) to get the installer to run. And maybe enable compatibility mode for good measure. If you can get the installer to run, then it will put SABI.sys in the proper location and register it for you, so you won't have to do that, just get the Sabi3.dll file from C:\Program Files (x86)\Samsung\EasySettings.
+You can still (I think*) use a program called FileUnsigner to remove the digital signature from the setup program, and then rename it to something else (ie. INSTALL_YOU_PIECE_OF_.exe) to get the installer to run. And maybe enable compatibility mode for good measure. If you can get the installer to run, then it will put SABI.sys in the proper location and register it for you, so you won't have to do that, just get the Sabi3.dll file from C:\Program Files (x86)\Samsung\EasySettings.
+
+* I did a lot of things to try to get this working after the 1511 upgrade, and I think that what I ended up doing was this process.
