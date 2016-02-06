@@ -1,0 +1,26 @@
+﻿<Window x:Class="SamsungHotkeys.OsdWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SamsungHotkeys"
+        mc:Ignorable="d"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        Background="#d0303030"
+        AllowsTransparency="True"
+        Title="OsdWindow" Width="400" SizeToContent="Height">
+    <Border BorderBrush="#2fffffff" BorderThickness="1">
+        <Grid>
+            <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="20">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="20 0 20 0">
+                    <TextBlock Name="TitleText" Foreground="#CCCCCC" FontSize="24" FontWeight="Bold" HorizontalAlignment="Left">OSD Text Goes Here</TextBlock>
+                    <TextBlock Name="ColorText" Foreground="LightGreen" FontSize="24" FontWeight="Bold" Visibility="Collapsed" Margin="10 0 0 0" HorizontalAlignment="Left">ON</TextBlock>
+                </StackPanel>
+                <Border HorizontalAlignment="Stretch" Visibility="Collapsed" Height="12" Margin="20 20 20 0" Background="#4f4f4f" Name="OsdProgressBar">
+                    <Border HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="50" Background="#CCCCCC" Name="OsdProgressBar_Progress" />
+                </Border>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

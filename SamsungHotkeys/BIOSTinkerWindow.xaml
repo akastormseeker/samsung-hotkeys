@@ -1,0 +1,52 @@
+﻿<Window x:Class="SamsungHotkeys.BIOSTinkerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SamsungHotkeys"
+        mc:Ignorable="d"
+        Title="Samsung BIOS Tinkering" Height="390" Width="659">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" HorizontalAlignment="Center" Margin="0,6,0,6" VerticalAlignment="Center" Width="300">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="BIOS Function:" HorizontalAlignment="Right" Margin="0,0,6,0" />
+            <TextBox Name="biosFnTextBox" Grid.Row="0" Grid.Column="1" Width="50" HorizontalAlignment="Left" HorizontalContentAlignment="Right" />
+
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Parameter(s):" HorizontalAlignment="Right" Margin="0,6,6,0" />
+            <RadioButton GroupName="InputType" Name="inputTypeBytes" Content="Bytes:" IsChecked="True" Grid.Row="1" Grid.Column="1" Margin="0,6,0,0" VerticalAlignment="Center" />
+            <TextBox Grid.Row="1" Grid.Column="2" Name="byte0" HorizontalAlignment="Stretch" Margin="6,6,0,0" HorizontalContentAlignment="Right" />
+            <TextBox Grid.Row="1" Grid.Column="3" Name="byte1" HorizontalAlignment="Stretch" Margin="6,6,0,0" HorizontalContentAlignment="Right" />
+            <TextBox Grid.Row="1" Grid.Column="4" Name="byte2" HorizontalAlignment="Stretch" Margin="6,6,0,0" HorizontalContentAlignment="Right" />
+            <TextBox Grid.Row="1" Grid.Column="5" Name="byte3" HorizontalAlignment="Stretch" Margin="6,6,0,0" HorizontalContentAlignment="Right" />
+
+            <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="5" Margin="0,6,0,0">
+                <RadioButton GroupName="InputType" Name="inputTypeBuffer" Content="Output Buffer:" Margin="0,0,6,0" VerticalAlignment="Center" />
+                <TextBox Text="100" Name="outputBufferSize" Margin="0,0,0,0" Width="50" HorizontalContentAlignment="Right" />
+                <TextBlock Margin="6,0,0,0" VerticalAlignment="Center">bytes</TextBlock>
+            </StackPanel>
+
+            <Button Content="Execute" Padding="20,0" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="5" HorizontalAlignment="Right" Margin="6,6,0,0" Click="Button_Click" />
+        </Grid>
+
+        <TextBox Grid.Row="1" Name="logTextBox" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" AcceptsReturn="True" IsReadOnly="True" Margin="6,6,6,6"  />
+    </Grid>
+</Window>
