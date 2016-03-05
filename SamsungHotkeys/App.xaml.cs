@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Data;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
@@ -16,24 +17,39 @@ namespace SamsungHotkeys
     /// </summary>
     public partial class App : Application
     {
+        static readonly Guid APP_GUID = new Guid("{C732A020-C10D-4350-8C41-4D3E3B946638}");
 
         HotkeyManager hkMgr;
         OsdWindow osdWindow = new OsdWindow();
-        BIOSTinkerWindow tinkerWindow = null;
+        
+        SettingsWindow settingsWindow = null;
 
         private readonly Brush redTextBrush = new SolidColorBrush(Color.FromArgb(255, 255, 0, 0));
         private readonly Brush greenTextBrush = new SolidColorBrush(Color.FromArgb(255, 0, 255, 0));
+        private readonly Brush lightTextBrush = new SolidColorBrush(Color.FromRgb(0xDC, 0xDC, 0xDC));
 
+        private Mutex appMutex;
+        
         private void Application_Startup(object sender, StartupEventArgs e)
         {
+
+            bool isNewInstance = false;
+            appMutex = new Mutex(true, "SamsungHotkeys", out isNewInstance);
+            if(!isNewInstance)
+            {
+                Debug.WriteLine("Another instance of SamsungHotkeys is already running!");
+                Application.Current.Shutdown();
+                return;
+            }
+
             try
             {
                 hkMgr = new HotkeyManager(Dispatcher);
             }
             catch(Controls.InterfaceNotInitializedException ex)
             {
-                System.Windows.Forms.MessageBox.Show("Unable to initialize the Samsung BIOS interface. It would seem that SABI.DLL is not properly installed.", "Samsung Hotkeys", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-                App.Current.Shutdown();
+                MessageBox.Show("Unable to initialize the Samsung BIOS interface. It would seem that SABI.DLL is not properly installed.", "Samsung Hotkeys", MessageBoxButton.OK, MessageBoxImage.Error);
+                Application.Current.Shutdown();
                 return;
             }
             
@@ -68,15 +84,7 @@ namespace SamsungHotkeys
             switch(e.HotkeyEvent)
             {
                 case Hotkey.EasySettings:
-                    if(SamsungHotkeys.Properties.Settings.Default.EnableTinkerWindow)
-                    {
-                        ShowOSD("BIOS Tinker Window");
-                        ShowTinkerWindow();
-                    }
-                    else if(SamsungHotkeys.Properties.Settings.Default.ShowUnusedOSDNotifications)
-                    {
-                        ShowOSD("Easy Settings");
-                    }
+                    ShowSettingsWindow();
                     break;
 
                 case Hotkey.ScreenBrightnessDown:
@@ -105,10 +113,7 @@ namespace SamsungHotkeys
                     break;
 
                 case Hotkey.CoolingMode:
-                    if (SamsungHotkeys.Properties.Settings.Default.ShowUnusedOSDNotifications)
-                    {
-                        ShowOSD("Cooling Mode", "LOUD", redTextBrush);
-                    }
+                    ShowOSD("Power Plan: ", (string)e.Parameter, lightTextBrush);
                     break;
 
                 case Hotkey.ToggleWireless:
@@ -129,20 +134,20 @@ namespace SamsungHotkeys
             }
         }
 
-        private void ShowTinkerWindow()
+        private void ShowSettingsWindow()
         {
-            if(tinkerWindow == null)
+            if (settingsWindow == null)
             {
-                tinkerWindow = new BIOSTinkerWindow(hkMgr.BIOSInterface);
-                tinkerWindow.Closed += TinkerWindow_Closed;
-                tinkerWindow.Show();
+                settingsWindow = new SettingsWindow(hkMgr.BIOSInterface);
+                settingsWindow.Closed += SettingsWindow_Closed;
+                settingsWindow.Show();
             }
-            tinkerWindow.Activate();
+            settingsWindow.Activate();
         }
 
-        private void TinkerWindow_Closed(object sender, EventArgs e)
+        private void SettingsWindow_Closed(object sender, EventArgs e)
         {
-            tinkerWindow = null;
+            settingsWindow = null;
         }
 
         private void ShowOSD(string text) { ShowOSD(text, null, null, false, 0); }
@@ -152,6 +157,8 @@ namespace SamsungHotkeys
         private void ShowOSD(string text, string colorText, Brush colorTextBrush, bool showProgressBar, double progressBarValue)
         {
             osdWindow.OsdText = text;
+
+            osdWindow.Topmost = true;
 
             osdWindow.OsdColorTextVisible = (colorText != null);
             osdWindow.OsdColorText = colorText;

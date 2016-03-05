@@ -25,7 +25,7 @@ namespace SamsungHotkeys.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool EnableTinkerWindow {
             get {
                 return ((bool)(this["EnableTinkerWindow"]));
@@ -34,7 +34,7 @@ namespace SamsungHotkeys.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool ShowUnusedOSDNotifications {
             get {
                 return ((bool)(this["ShowUnusedOSDNotifications"]));

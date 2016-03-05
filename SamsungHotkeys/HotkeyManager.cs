@@ -38,7 +38,7 @@ namespace SamsungHotkeys
                 case Hotkey.EasySettings: ShowOSD(Hotkey.EasySettings); break;
                 case Hotkey.ScreenBrightnessDown: ScreenBrightnessDown(); break;
                 case Hotkey.ScreenBrightnessUp: ScreenBrightnessUp(); break;
-                case Hotkey.DisplaySwitch: ShowOSD(Hotkey.DisplaySwitch); break;
+                case Hotkey.DisplaySwitch: SwitchDisplayModes(); break;
                 case Hotkey.TouchpadDisabled: ShowOSD(Hotkey.TouchpadDisabled); break;
                 case Hotkey.TouchpadEnabled: ShowOSD(Hotkey.TouchpadEnabled); break;
                 case Hotkey.VolumeMute:
@@ -46,7 +46,7 @@ namespace SamsungHotkeys
                 case Hotkey.VolumeUp: ShowVolumeOSD(e.Hotkey, e.IsKeyRelease); break;
                 case Hotkey.KeyboardBacklightDown: KbBacklightDown(); break;
                 case Hotkey.KeyboardBacklightUp: KbBacklightUp(); break;
-                case Hotkey.CoolingMode: ShowOSD(Hotkey.CoolingMode); break;
+                case Hotkey.CoolingMode: CyclePowerPlan(); break;
                 case Hotkey.ToggleWireless: ToggleWireless(); break;
                 case Hotkey.FnLockDisabled: ShowOSD(Hotkey.FnLockDisabled); break;
                 case Hotkey.FnLockEnabled: ShowOSD(Hotkey.FnLockEnabled); break;
@@ -73,6 +73,28 @@ namespace SamsungHotkeys
                     Controls.ODDrive.Eject();
                 }).Start();
             }
+        }
+
+        private void CyclePowerPlan()
+        {
+            mDispatcher.BeginInvoke(new Action(() =>
+            {
+                Controls.PowerPlan[] plans = Controls.PowerManager.GetAllPowerPlans();
+                int active = 0;
+                for (int i = 0; i < plans.Length; i++)
+                {
+                    if (plans[i].IsActive) active = i;
+                }
+                active = (active + 1) % plans.Length;
+                ShowOSD(Hotkey.CoolingMode, plans[active].Name);
+                plans[active].Activate();
+            })); 
+        }
+
+        private void SwitchDisplayModes()
+        {
+            Controls.Displays.GetDisplayDevices();
+            ShowOSD(Hotkey.DisplaySwitch);
         }
 
         private void KbBacklightDown()
@@ -194,12 +216,21 @@ namespace SamsungHotkeys
             }
         }
 
+        private void ShowOSD(Hotkey hotkey, object parameter)
+        {
+            if(ShowOSDEvent != null)
+            {
+                ShowOSDEvent(this, new ShowOSDEventArgs(hotkey, parameter));
+            }
+        }
+
         public delegate void ShowOSDEventHandler(object sender, ShowOSDEventArgs e);
         public class ShowOSDEventArgs : EventArgs
         {
             public Hotkey HotkeyEvent { get; private set; }
             public int Level { get; private set; }
             public bool HasLevel { get; private set; }
+            public object Parameter { get; private set; }
 
             public ShowOSDEventArgs(Hotkey hotkey)
             {
@@ -213,6 +244,15 @@ namespace SamsungHotkeys
                 HotkeyEvent = hotkey;
                 Level = level;
                 HasLevel = true;
+                Parameter = null;
+            }
+
+            public ShowOSDEventArgs(Hotkey hotkey, object parameter)
+            {
+                HotkeyEvent = hotkey;
+                Level = -1;
+                HasLevel = false;
+                Parameter = parameter;
             }
         }
     }

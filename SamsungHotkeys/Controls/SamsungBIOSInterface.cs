@@ -31,6 +31,28 @@ namespace SamsungHotkeys.Controls
             BIOSModelName = GetModelName();
         }
 
+        private bool CheckInterface(int ifaceNum)
+        {
+            byte[] data = new byte[] { 0xBB, 0xAA, 0x00, 0x00 };
+            if (NativeMethods.CallBIOSInterface(ifaceNum, data) != 0)
+            {
+                return false;
+            }
+            if(data[0] != 0xDD || data[1] != 0xCC)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        public bool CheckALSExistence()
+        {
+            Microsoft.Win32.RegistryKey key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey("SYSTEM\\CurrentControlSet\\Enum\\ACIP\\ACPI0008");
+            if (key == null) return false;
+            key.Close();
+            return true;
+        }
+
         public bool GetWirelessStatus(out byte[] status)
         {
             byte[] buffer = new byte[] { 0x00, 0x00, 0x00, 0x00 };
@@ -63,6 +85,70 @@ namespace SamsungHotkeys.Controls
             return true;
         }
 
+        public bool GetBLEEnabled()
+        {
+            byte[] buffer = new byte[] { 0x80, 0x00, 0x00, 0x00 };
+            int rv = NativeMethods.CallBIOSInterface((int)BIOSFunctions.GetBLEStatus, buffer);
+            if(rv != 0)
+            {
+                Debug.WriteLine("Error reading BLE status!");
+                throw new MethodInvocationException("GetBatteryLifeExtenderStatus");
+            }
+            if(buffer[0] == 0xff)
+            {
+                Debug.WriteLine("Battery Life Extender isn't supported.");
+                return false;
+            }
+            return buffer[0] == 1;
+        }
+
+        public void SetBLEEnabled(bool enabled)
+        {
+            byte[] buffer = new byte[] { (byte)(enabled ? 0x81 : 0x80), 0x00, 0x00, 0x00 };
+            int rv = NativeMethods.CallBIOSInterface((int)BIOSFunctions.SetBLEStatus, buffer);
+            if (rv != 0)
+            {
+                Debug.WriteLine("Error setting BLE status!");
+                throw new MethodInvocationException("SetBatteryLifeExtenderStatus");
+            }
+            if (buffer[0] == 0xff)
+            {
+                Debug.WriteLine("Battery Life Extender isn't supported.");
+            }
+        }
+
+        public bool GetUSBChargingEnabled()
+        {
+            byte[] buffer = new byte[] { 0x80, 0x00, 0x00, 0x00 };
+            int rv = NativeMethods.CallBIOSInterface((int)BIOSFunctions.GetChargeableUSBStatus, buffer);
+            if (rv != 0)
+            {
+                Debug.WriteLine("Error reading USB Charging status!");
+                throw new MethodInvocationException("GetUSBChargingStatus");
+            }
+            if (buffer[0] == 0xff)
+            {
+                Debug.WriteLine("USB Charging isn't supported.");
+                return false;
+            }
+            return buffer[0] == 1;
+        }
+
+        public void SetUSBChargingEnabled(bool enabled)
+        {
+            byte[] buffer = new byte[] { (byte)(enabled ? 0x81 : 0x80), 0x00, 0x00, 0x00 };
+            int rv = NativeMethods.CallBIOSInterface((int)BIOSFunctions.SetChargeableUSBStatus, buffer);
+            if (rv != 0)
+            {
+                Debug.WriteLine("Error setting USB Charging status!");
+                throw new MethodInvocationException("SetUSBChargingStatus");
+            }
+            if (buffer[0] == 0xff)
+            {
+                Debug.WriteLine("Battery Life Extender isn't supported.");
+            }
+        }
+
         public int GetKbBacklightBrightness()
         {
             byte[] buffer = new byte[] { 0x81, 0, 0, 0 };
@@ -85,66 +171,7 @@ namespace SamsungHotkeys.Controls
                 throw new MethodInvocationException("SetKbBacklightBrightness");
             }
         }
-
-
-        public int GetKeybardALSStatus()
-        {
-            byte[] buffer = new byte[4];
-            buffer[1] = buffer[2] = buffer[3] = 0;
-            buffer[0] = 0x80;
-            int rv = NativeMethods.CallBIOSInterface((int)BIOSFunctions.KbBacklight, buffer);
-            Debug.WriteLine("CallBIOSInterface(0x78, 0x00000080) returned {0}; data[0]=[{1}, {2}, {3}, {4}]", rv, buffer[0].ToString("X2"), buffer[1].ToString("X2"), buffer[2].ToString("X2"), buffer[3].ToString("X2"));
-            if (rv != 0)
-            {
-                Debug.WriteLine("Error calling SABI interface!");
-                throw new MethodInvocationException("GetKeyboardALSStatus");
-            }
-
-            if (buffer[0] == 0xFF)
-            {
-                Debug.WriteLine("Unable to get Keyboard ALS Status!");
-                throw new MethodNotSupportedException("GetKeyboardALSStatus");
-            }
-
-            return buffer[0];
-        }
-
-        private bool GetKeybardBacklight81(out int status)
-        {
-            byte[] buffer = new byte[4];
-            buffer[1] = buffer[2] = buffer[3] = 0;
-            buffer[0] = 0x81;
-            int rv = NativeMethods.CallBIOSInterface((int)BIOSFunctions.KbBacklight, buffer);
-            Debug.WriteLine("CallBIOSInterface(0x78, 0x00000080) returned {0}; data[0]=[{1}, {2}, {3}, {4}]", rv, buffer[0].ToString("X2"), buffer[1].ToString("X2"), buffer[2].ToString("X2"), buffer[3].ToString("X2"));
-            if (rv != 0)
-            {
-                Debug.WriteLine("Error calling SABI interface!");
-                status = 0;
-                return false;
-            }
-
-            status = 0;
-            return true;
-        }
-
-        private bool GetKeybardBacklight82(out int status)
-        {
-            byte[] buffer = new byte[4];
-            buffer[1] = buffer[2] = buffer[3] = 0;
-            buffer[0] = 0x82;
-            int rv = NativeMethods.CallBIOSInterface((int)BIOSFunctions.KbBacklight, buffer);
-            Debug.WriteLine("CallBIOSInterface(0x78, 0x00000080) returned {0}; data[0]=[{1}, {2}, {3}, {4}]", rv, buffer[0].ToString("X2"), buffer[1].ToString("X2"), buffer[2].ToString("X2"), buffer[3].ToString("X2"));
-            if (rv != 0)
-            {
-                Debug.WriteLine("Error calling SABI interface!");
-                status = 0;
-                return false;
-            }
-
-            status = 0;
-            return true;
-        }
-
+        
         public void SetVolumeMuteLight(bool on)
         {
             byte[] buffer = new byte[4];
@@ -223,12 +250,28 @@ namespace SamsungHotkeys.Controls
 
         private enum BIOSFunctions : int
         {
-            GetModelName = 0x04,     // use with BIOSInterfaceGetString()
+            GetModelName = 0x04,            // use with BIOSInterfaceGetString()
 
+            GetBIOSStatus = 0x0B,           // check for status of various things
+                                            // 0x08 = Battery Life Extender
+                                            // 0x10 = Chargeable USB
+                                            // 0x20 = Fast Start
+
+            GetBrightnessMode = 0x10,       // status in byte 0
+
+            GetEtiquetteMode = 0x31,        // status in byte 0
+
+            GetBLEStatus = 0x65,            // [ 0x80, 0, 0, 0 ] returns [ <status>, 0, 0, 0 ]; 0xFF = error, 1 = enabled, 0 = disabled
+            SetBLEStatus = 0x66,            // [ 0x80... ] to disable, [ 0x81... ] to enable
+            GetChargeableUSBStatus = 0x67,  // [ 0x80, 0, 0, 0 ] returns [ <status>, 0, 0, 0 ];
+            SetChargeableUSBStatus = 0x68,  // [ 0x80... ] to disable, [ 0x81... ] to enable
             GetWirelessStatus = 0x69,  // bytes 0-2 = status of wifi, wwan, bluetooth; 0 = off, 1 = on, 2 = n/a
             SetWirelessStatus = 0x6A,  // bytes 0-2 = wifi, wwan, bt; 0 = off, 1 = on, 2 = [in]leave as-is [out]n/a
+            
+            GetFastStartStatus = 0x6D,      // [ 0x80... ] returns status?
+            SetFastStartEnabled = 0x6E,     // [ 0x80... ] to disable, [ 0x81... ] to enable
 
-            KbBacklight = 0x78,
+            KbBacklight = 0x78,         // [ 0x80... ] returns some status, [ 0x83, 0x01/0x00, 0, 0 ] sets kb backlight auto enabled
 
             SetMuteLight = 0x79, // Test: BB/AA/00/00; 81/[on/off]/0/0
         }

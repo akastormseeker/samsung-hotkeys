@@ -62,9 +62,17 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Controls\Displays.cs" />
     <Compile Include="Controls\ODDrive.cs" />
+    <Compile Include="Controls\PowerManager.cs" />
     <Compile Include="Controls\ScreenBrightness.cs" />
     <Compile Include="Controls\SamsungBIOSInterface.cs" />
+    <Compile Include="MathConverter.cs" />
+    <Compile Include="SettingsWindow.xaml.cs">
+      <DependentUpon>SettingsWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ToggleSwitch.cs" />
+    <Compile Include="WindowServices.cs" />
     <Page Include="BIOSTinkerWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -78,6 +86,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="OsdWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SettingsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -113,9 +125,7 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
-    <Content Include="SABI.sys">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <Content Include="SABI.sys" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

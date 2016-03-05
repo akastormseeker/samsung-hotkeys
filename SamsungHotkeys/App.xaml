@@ -6,6 +6,7 @@
              Exit="Application_Exit"
              ShutdownMode="OnExplicitShutdown">
     <Application.Resources>
-         
+        
+        
     </Application.Resources>
 </Application>

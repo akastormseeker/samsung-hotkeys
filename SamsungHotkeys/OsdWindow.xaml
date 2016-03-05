@@ -9,6 +9,8 @@
         ResizeMode="NoResize"
         Background="#d0303030"
         AllowsTransparency="True"
+        ShowInTaskbar="False"
+        Topmost="True"
         Title="OsdWindow" Width="400" SizeToContent="Height">
     <Border BorderBrush="#2fffffff" BorderThickness="1">
         <Grid>
